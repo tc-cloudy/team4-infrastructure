@@ -1,0 +1,99 @@
+
+---
+- hosts: all
+  become: true
+  gather_facts: no
+  vars_files: vars/default.yml
+      
+  tasks: 
+    - name: Install prerequisites
+      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+      tags: [ system ]
+
+    - name: Install LAMP Packages
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
+      tags: [ system ]
+
+    - name: Install PHP Extensions
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: "{{ php_modules }}"
+      tags: [ system ]
+
+    - name: Install Apache
+      yum: 
+        name: httpd
+        state: latest
+
+    - name: ensure Apache is running
+      service:
+        name: httpd 
+        state: started
+   
+    - name: Open port 80 for http access
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+
+    # - name: Set file permissions for Apache
+    # ##
+    # ##
+
+    - name: Download and unpack latest Wordpress
+      unarchive:
+        src: https://wordpress.org/latest.tar.gz
+        dest: "/var/www/{{ http_host }}"
+        remote_src: yes
+        creates: "/var/www/{{ http_host }}/wordpress"
+      tags: [ wordpress ]
+
+   
+    - name: Start database server
+      service: 
+        name: mysql
+        state: started 
+        enabled: yes
+
+    # - name: Login to MySQL as root
+    # # vars: user and password
+    # #
+
+    # - name: Grant full privileges for your database to the WordPress user
+    # #
+    # #
+
+
+    - name: Set ownership
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+      tags: [ wordpress ]
+
+    - name: Set permissions for directories
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
+      tags: [ wordpress ]
+
+    - name: Set permissions for files
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
+      tags: [ wordpress ]
+
+    - name: Set up wp-config
+      template:
+        src: "files/wp-config.php.j2"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
+      tags: [ wordpress ]
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
