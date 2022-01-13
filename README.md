@@ -23,6 +23,17 @@ Once the feature is in development and it passes all the tests, a pull request i
 
 Example feature branch name: feature/vpc
 
+Useful commands:
+git clone <reponame>
+git checkout -b <branchname>
+git status
+git diff
+git add <files>
+git commit -m "messsage"
+git push
+
+existing
+git checkout <existingbranchname>
 
 ## Deploying Resources
 
