@@ -1,6 +1,6 @@
 #DATABASE INSTANCE - MYSQL
 resource "aws_db_instance" "mysql" {
-  allocated_storage      = 20
+  allocated_storage      = 20 #This is the recommended value
   storage_type           = "gp2"
   engine                 = "MySQL"
   engine_version         = "5.7"
