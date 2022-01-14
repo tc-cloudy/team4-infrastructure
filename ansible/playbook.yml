@@ -1,59 +1,107 @@
 
 ---
-- hosts: all
-  become: true
-  gather_facts: no
+- hosts: webservers
+  become: yes
+  gather_facts: yes
   vars_files: vars/default.yml
       
   tasks: 
-    - name: Install prerequisites
-      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
-      tags: [ system ]
 
-    - name: Install LAMP Packages
-      apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
-      tags: [ system ]
+  # - name: Install the mysql rpm from a remote repo
+  #   yum:
+  #     name: "{{ item }}"
+  #     state: present
+  #   loop: 
+  #     - https://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql-community-common-5.7.36-1.el7.i686.rpm
+  #     - https://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql-community-client-5.7.36-1.el7.i686.rpm
+  #     - https://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql-community-server-5.7.36-1.el7.x86_64.rpm
 
-    - name: Install PHP Extensions
-      apt: name={{ item }} update_cache=yes state=latest
-      loop: "{{ php_modules }}"
-      tags: [ system ]
+  - name: Installing Complete LampStack
+    yum: name={{ item }} state=present
+    with_items:
+    - httpd
+    - php
+    - php-mysqlnd
+    - mariadb-server
+    - php-mbstring
+    - MySQL-python
+ 
 
-    - name: Install Apache
-      yum: 
-        name: httpd
-        state: latest
+  - name: Restarting Apache
+    service:
+      name: httpd
+      state: restarted 
+      enabled: yes
 
-    - name: ensure Apache is running
-      service:
-        name: httpd 
-        state: started
+  - name: Restarting MySQL
+    service:
+      name: mariadb
+      state: restarted
+      enabled: yes
+  
+  
+
+    # - name: Installing Complete LampStack
+    #   yum: name={{ item }} state=present
+    #   with_items:
+    #   - httpd24
+    #   - php71
+    #   - mysql55-server
+    #   - php71-mysqlnd
+    #   - php71-mbstring
+    #   - MySQL-python27
+
+    # - name: Install LAMP Packages
+    #   yum: name={{ item }} update_cache=yes state=latest
+    #   loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php' ]
+    #   tags: [ system ]
+
+
+  - name: Install PHP Extensions
+    yum: name={{ item }} update_cache=yes state=latest
+    loop: "{{ php_modules }}"
+    tags: [ system ]
+
+
+  
    
-    - name: Open port 80 for http access
-      firewalld:
-        service: http
-        permanent: true
-        state: enabled
+
+    # - name: Install firewalld
+    #   yum:
+    #     name: firewalld
+    #     state: latest
+    #   notify:
+    #     - start firewalld
+    # - name: start firewalld
+    #   service:
+    #     name: firewalld
+    #     state: started
+    #     enabled: yes
+    #   become: yes
+  # - name: Open port 80 for http access
+  #   firewalld:
+  #     service: http
+  #     permanent: true
+  #     state: enabled
 
     # - name: Set file permissions for Apache
     # ##
     # ##
 
-    - name: Download and unpack latest Wordpress
-      unarchive:
-        src: https://wordpress.org/latest.tar.gz
-        dest: "/var/www/{{ http_host }}"
-        remote_src: yes
-        creates: "/var/www/{{ http_host }}/wordpress"
-      tags: [ wordpress ]
+  - name: Download and unpack latest Wordpress
+    unarchive:
+      src: https://wordpress.org/latest.tar.gz
+      dest: "/var/www/{{ http_host }}"
+      remote_src: yes
+      creates: "/var/www/{{ http_host }}/wordpress"
+    tags: [ wordpress ]
 
    
-    - name: Start database server
-      service: 
-        name: mysql
-        state: started 
-        enabled: yes
+  - name: Start database server
+    service: 
+      name: mysql
+      state: started 
+      enabled: yes
 
     # - name: Login to MySQL as root
     # # vars: user and password
@@ -64,36 +112,36 @@
     # #
 
 
-    - name: Set ownership
-      file:
-        path: "/var/www/{{ http_host }}"
-        state: directory
-        recurse: yes
-        owner: www-data
-        group: www-data
-      tags: [ wordpress ]
+  - name: Set ownership
+    file:
+      path: "/var/www/{{ http_host }}"
+      state: directory
+      recurse: yes
+      owner: www-data
+      group: www-data
+    tags: [ wordpress ]
 
-    - name: Set permissions for directories
-      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
-      tags: [ wordpress ]
+  - name: Set permissions for directories
+    shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
+    tags: [ wordpress ]
 
-    - name: Set permissions for files
-      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
-      tags: [ wordpress ]
+  - name: Set permissions for files
+    shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
+    tags: [ wordpress ]
 
-    - name: Set up wp-config
-      template:
-        src: "files/wp-config.php.j2"
-        dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
-      tags: [ wordpress ]
+  - name: Set up wp-config
+    template:
+      src: "files/wp-config.php.j2"
+      dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"
+    tags: [ wordpress ]
 
   handlers:
-    - name: Reload Apache
-      service:
-        name: apache2
-        state: reloaded
+  - name: Reload Apache
+    service:
+      name: apache2
+      state: reloaded
 
-    - name: Restart Apache
-      service:
-        name: apache2
-        state: restarted
+  - name: Restart Apache
+    service:
+      name: apache2
+      state: restarted
