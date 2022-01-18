@@ -21,12 +21,12 @@
     - php-mbstring
     - MySQL-python
 
-   
-  - name: Downloading pymysql.
-    get_url: url=https://files.pythonhosted.org/packages/4f/52/a115fe175028b058df353c5a3d5290b71514a83f67078a6482cff24d6137/PyMySQL-1.0.2-py3-none-any.whl  dest=/tmp/pymysql.tar
 
-  - name: Extracting pymysql contents.
-    unarchive: src=/tmp/pymysql.tar dest=/tmp/  remote_src=yes
+  - name: install PyMySQL
+    pip: 
+      name: PyMySQL
+      state: present
+   
 
   - name: Restarting Apache
     service:
@@ -43,11 +43,10 @@
 #######################################################################
 # Configuring Mysql And Creating Necessary User,Database for wordpress
 #######################################################################
-
   - name: mysql-removing anon users.
     mysql_user: 
       login_user: root 
-      login_password: "{{ mysql_root_password }}"
+      login_password: #"{{ mysql_root_password }}"
       name: ''  
       host_all: yes 
       state: absent
@@ -57,15 +56,15 @@
       name: "{{ mysql_db }}"
       state: present        
       login_user: root
-      login_password: "{{ mysql_root_password }}"
+      login_password: #"{{ mysql_root_password }}"
 
   - name: Create MySQL user for WordPress
     mysql_user:
       name: "{{ mysql_user }}"
-      password: "{{ mysql_password }}"
+      password: #"{{ mysql_password }}"
       state: present
       login_user: root
-      login_password: "{{ mysql_root_password }}"
+      login_password: #"{{ mysql_root_password }}"
 
 #######################################################################
 # Configuring Mysql And Creating Necessary User,Database for wordpress
