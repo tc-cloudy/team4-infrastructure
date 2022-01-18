@@ -3,14 +3,14 @@
 php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
 
 #MySQL Settings
-#mysql_root_password: 
+mysql_root_password: "password"
 mysql_db: "wordpress"
 mysql_user: "sammy"
-#mysql_password: 
+mysql_password: "password"
 
 #HTTP Settings
 http_host: "your_domain"
 http_conf: "your_domain.conf"
 http_port: "80"
 
-#ansible_python_interpreter: '/Users/karolina.ryba/.pyenv/versions/3.10.0/bin/python3.10'
+ansible_python_interpreter: '/usr/bin/python3'
