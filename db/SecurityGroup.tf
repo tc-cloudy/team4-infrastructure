@@ -1,3 +1,18 @@
+data "aws_vpc" "vpc" {
+  tags = {
+    Name = "Main_VPC"
+  }
+}
+
+data "aws_security_group" "ec2SG" {
+    filter {
+    name   = "tag:Name"
+    values = ["ec2_securitygroup"]
+    }
+}
+
+
+
 # Security group for RDS
 resource "aws_security_group" "RDS_allow_rule" {
   vpc_id = data.aws_vpc.vpc.id
@@ -7,7 +22,6 @@ resource "aws_security_group" "RDS_allow_rule" {
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [data.aws_security_group.ec2SG.id]
-    cidr_blocks = [var.DBSubnetA_cidr]  #WP subnet
   }
   egress {
     from_port   = 0
