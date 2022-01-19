@@ -4,10 +4,6 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "vpc_internet_gateway" {
-  description = "Internet gateway"
-  type        = string
-}
 
 #PublicSubnets
 variable "PublicSubnetA_cidr" {

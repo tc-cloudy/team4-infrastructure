@@ -1,6 +1,6 @@
 #VPC
 vpc_cidr             = "10.0.0.0/16"
-vpc_internet_gateway = "internet_gateway"
+
 
 #PublicSubnet
 PublicSubnetA_cidr = "10.0.1.0/24"
