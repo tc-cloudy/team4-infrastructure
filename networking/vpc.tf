@@ -88,6 +88,10 @@ resource "aws_subnet" "DBSubnetB" {
 resource "aws_db_subnet_group" "db_subnet" {
   name       = "db_subnet"
   subnet_ids = ["${aws_subnet.DBSubnetA.id}", "${aws_subnet.DBSubnetB.id}"]
+
+   tags = {
+    Name = "db_subnet"
+  }
 }
 
 
