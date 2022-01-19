@@ -17,7 +17,7 @@ resource "aws_instance" "wp-serverA" {
   ami = data.aws_ami.amazon-linux-2.id
   vpc_security_group_ids  = [aws_security_group.ec2_securitygroup.id]
   instance_type= "t2.micro"
-  subnet_id = aws_subnet.PrivateSubnetA.id
+  subnet_id = data.aws_subnet.PrivateSubnetA.id
   key_name = "ec2instance-key"
   user_data = file("files/userdata.sh")
   tags = {
@@ -31,10 +31,26 @@ resource "aws_instance" "wp-serverB" {
   ami = data.aws_ami.amazon-linux-2.id
   vpc_security_group_ids  = [aws_security_group.ec2_securitygroup.id]
   instance_type= "t2.micro"
-  subnet_id = aws_subnet.PrivateSubnetB.id
+  subnet_id = data.aws_subnet.PrivateSubnetB.id
   key_name = "ec2instance-key"
   user_data = file("files/userdata.sh")
   tags = {
     Name = "webserver B"
           }
+}
+
+
+
+data "aws_subnet" "PrivateSubnetA" {
+    filter {
+    name   = "tag:Name"
+    values = ["Private_SubnetA"]
+    }
+}
+
+data "aws_subnet" "PrivateSubnetB" {
+    filter {
+    name   = "tag:Name"
+    values = ["Private_SubnetB"]
+    }
 }
