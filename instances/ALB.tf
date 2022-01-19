@@ -6,7 +6,7 @@ data "aws_subnet" "PublicSubnetA" {
 
 data "aws_subnet" "PublicSubnetB" {
   tags = {
-    Name = "Public_SubnetA"
+    Name = "Public_SubnetB"
   }
 }
 
@@ -15,7 +15,7 @@ data "aws_internet_gateway" "IGW"{
     Name = "vpc_internet_gateway"
   }
 }
-
+ 
 
 resource "aws_alb" "alb" {
   name = "ALB"
