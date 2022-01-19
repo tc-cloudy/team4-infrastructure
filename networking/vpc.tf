@@ -18,7 +18,7 @@ resource "aws_internet_gateway" "IGW" {
   }
 }
 
-#Routing Table
+#Public Routing Table
 resource "aws_route_table" "public-routes" {
     vpc_id = aws_vpc.vpc.id
     route {
@@ -81,16 +81,6 @@ resource "aws_subnet" "DBSubnetB" {
 
   tags = {
     Name = "DB_SubnetB"
-  }
-}
-
-# make db subnet group 
-resource "aws_db_subnet_group" "db_subnet" {
-  name       = "db_subnet"
-  subnet_ids = ["${aws_subnet.DBSubnetA.id}", "${aws_subnet.DBSubnetB.id}"]
-
-   tags = {
-    Name = "db_subnet"
   }
 }
 
