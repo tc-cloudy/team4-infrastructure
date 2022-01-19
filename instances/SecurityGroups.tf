@@ -1,3 +1,10 @@
+#VPC
+data "aws_vpc" "vpc" {
+  tags = {
+    Name = "Main_VPC"
+  }
+}
+
 //security group for EC2
 resource "aws_security_group" "ec2_securitygroup" { 
   name = "ec2_securitygroup"
@@ -42,5 +49,30 @@ ingress {
   vpc_id = data.aws_vpc.vpc.id
   tags = {
     Name = "ec2_securitygroup"
+  }
+}
+
+#LoadBalancer security group
+resource "aws_security_group" "alb" {
+  name = "pub-secgroup"
+  vpc_id = data.aws_vpc.vpc.id
+
+  # ssh access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+tags = {
+    Name = "ALB_securitygroup"
   }
 }

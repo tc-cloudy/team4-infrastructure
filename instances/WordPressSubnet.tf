@@ -1,3 +1,20 @@
+#NATGW AZ-A
+data "aws_nat_gateway" "natgwa" {
+   filter {
+    name   = "tag:Name"
+    values = ["NAT_GATEWAYA"]
+  }
+}
+
+#NATGW AZ-B
+data "aws_nat_gateway" "natgwb" {
+   filter {
+    name   = "tag:Name"
+    values = ["NAT_GATEWAYB"]
+  }
+}
+
+
 #PrivateSubnet for the ec2- azA & azB
 resource "aws_subnet" "PrivateSubnetA" {
   vpc_id            = data.aws_vpc.vpc.id
