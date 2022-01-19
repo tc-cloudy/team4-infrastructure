@@ -26,7 +26,7 @@ resource "aws_eip" "eipB" {
   }
   depends_on = [aws_internet_gateway.IGW]
 }
-resource "aws_nat_gateway" "NatB" {
+resource "aws_nat_gateway" "NAT-B" {
   subnet_id     = aws_subnet.PublicSubnetB.id
   allocation_id = aws_eip.eipB.id
   
