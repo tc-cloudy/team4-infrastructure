@@ -1,10 +1,10 @@
 ---
 
 #MySQL Settings
-#mysql_root_password: "password"
+#mysql_root_password: 
 mysql_db: "wordpress"
 mysql_user: "ec2-user"
-#mysql_password: "password"
+#mysql_password: 
 
 #HTTP Settings
 http_host: "your_domain"
@@ -15,5 +15,5 @@ http_port: "80"
 
 #wordpress config
 wordpress_db: wordpress
-wordpress_user: wpuser
-wordpress_password: password123
+wordpress_user: admin
+wordpress_password: "password123"
