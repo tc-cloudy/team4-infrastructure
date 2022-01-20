@@ -23,6 +23,7 @@ resource "aws_instance" "wp-serverA" {
   tags = {
     Name = "webserver A"
          }
+  depends_on = [data.aws_db_instance.rds]
 }
 
 
@@ -37,6 +38,7 @@ resource "aws_instance" "wp-serverB" {
   tags = {
     Name = "webserver B"
           }
+depends_on = [data.aws_db_instance.rds]
 }
 
 
@@ -54,3 +56,8 @@ data "aws_subnet" "PrivateSubnetB" {
     values = ["Private_SubnetB"]
     }
 }
+
+data "aws_db_instance" "rds" {
+  db_instance_identifier = "wp-db"
+}
+
