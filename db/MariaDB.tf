@@ -9,6 +9,11 @@ resource "aws_db_instance" "wp-db" {
   username = var.aws_wp_db_user
   db_subnet_group_name = aws_db_subnet_group.db_subnet.name
   vpc_security_group_ids = [aws_security_group.RDS_allow_rule.id]
+
+  tags = {
+    Name = "wp-db"
+  }
+
 }
 
 # make db subnet group 
