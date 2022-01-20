@@ -1,6 +1,6 @@
 #inventory
 [webservers]
-app1 ansible_host=3.9.170.59 #change ec2 ip
+app1 ansible_host=3.9.17.152 #change ec2 ip
 
 [local]
 control ansible_connection=local
