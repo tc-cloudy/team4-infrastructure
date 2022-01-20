@@ -14,11 +14,15 @@ cd /var/www
 mkdir inc
 cd inc
 echo "<?php
-define('DB_SERVER', '${rds_endpoint}');
-define('DB_USERNAME', '${user}');
-define('DB_PASSWORD', '${password}');
-define('DB_DATABASE', '${dbname}');
+define('DB_SERVER', '${wp-db.csx4c8lydoo4.eu-west-1.rds.amazonaws.com}');
+define('DB_USERNAME', '${admin}');
+define('DB_PASSWORD', '${password123}');
+define('DB_DATABASE', '${wordpress_db}');
 ?>" > dbinfo.inc
 
-sudo git clone https://github.com/arin7637/terraform-code-rds.git && cd terraform-code-rds
+
+sudo git clone https://github.com/tc-cloudy/team4-infrastructure/tree/feature/ec2.git && cd terraform-code-rds
 sudo cp SamplePage.php index.html  /var/www/html/
+
+
+
