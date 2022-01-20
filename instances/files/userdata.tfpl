@@ -21,8 +21,5 @@ define('DB_DATABASE', '${wordpress_db}');
 ?>" > dbinfo.inc
 
 
-sudo git clone https://github.com/tc-cloudy/team4-infrastructure/tree/feature/ec2.git && cd terraform-code-rds
+sudo git clone https://github.com/arin7637/terraform-code-rds.git && cd terraform-code-rds
 sudo cp SamplePage.php index.html  /var/www/html/
-
-
-
