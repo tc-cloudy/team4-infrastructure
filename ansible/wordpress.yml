@@ -1,0 +1,133 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - vars/default.yml
+
+  tasks:
+
+#######################################################################
+# Installing full lampStack and php mysql bindings
+#######################################################################
+
+  - name: Installing Complete LampStack
+    yum: name={{ item }} state=latest
+    with_items:
+    - httpd
+    - php
+    - mariadb-server
+    - php-mysqlnd
+    - php-mbstring
+    - MySQL-python
+
+
+  - name: install PyMySQL
+    pip: 
+      name: PyMySQL
+      state: present
+   
+
+  - name: Restarting Apache
+    service:
+      name: httpd
+      state: restarted 
+      enabled: yes
+
+  - name: Restarting MySQL
+    service:
+      name: mariadb
+      state: restarted
+      enabled: yes
+
+#######################################################################
+# Configuring Mysql And Creating Necessary User,Database for wordpress
+#######################################################################
+  - name: Set the root password
+    mysql_user:
+      name: root
+      password: "{{ mysql_root_password }}"
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+    tags: [ mysql, mysql-root ]
+
+  
+  - name: mysql-removing anon users.
+    mysql_user: 
+      login_user: root 
+      login_password: "{{ mysql_root_password }}"
+      name: ''  
+      host_all: yes 
+      state: absent
+
+  - name: Creates database for WordPress
+    mysql_db:
+      name: "{{ mysql_db }}"
+      state: present        
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+
+  - name: Create MySQL user for WordPress
+    mysql_user:
+      name: "{{ mysql_user }}"
+      password: "{{ mysql_password }}"
+      state: present
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+
+#######################################################################
+# Configuring Mysql And Creating Necessary User,Database for wordpress
+#######################################################################
+
+
+  - name: Downloading Wodpress.
+    get_url: url=http://www.wordpress.org/latest.tar.gz  dest=/tmp/wordpress.tar
+
+  - name: Extracting wordpress contents.
+    unarchive: src=/tmp/wordpress.tar dest=/tmp/  remote_src=yes
+
+  - name: Copying wordpress contents.
+    shell: "cp -r /tmp/wordpress/*  /var/www/html/"
+
+
+  - name: Copying wp-config.php file.
+    copy: src=/var/www/html/wp-config-sample.php  dest=/var/www/html/wp-config.php remote_src=yes
+
+#######################################################################
+# Cleaning extracted directory and tar file
+#######################################################################
+
+  - name: Removing Wordpress.tar
+    file: path=/tmp/wordpress.tar state=absent
+
+  - name: Removing Wodpress Extracted Directory.
+    file: path=/tmp/wordpress state=absent
+
+#######################################################################
+# Wordpress Configuration
+#######################################################################
+
+  - name: Chaning Doc-root permission.
+    shell: 'chown -R apache:apache /var/www/html/'
+    args:
+     warn: false # set warn=false to prevent warning
+
+  - name: Update WordPress config file
+    lineinfile:
+      dest: "/var/www/html/wp-config.php"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+     - {'regexp': "define\\('DB_NAME', '(.)+'\\);", 'line': "define('DB_NAME', '{{wordpress_db}}');"}
+     - {'regexp': "define\\('DB_USER', '(.)+'\\);", 'line': "define('DB_USER', '{{wordpress_user}}');"}
+     - {'regexp': "define\\('DB_PASSWORD', '(.)+'\\);", 'line': "define('DB_PASSWORD', '{{wordpress_password}}');"}
+
+
+#######################################################################
+# Final Service Restart
+#######################################################################
+
+  - name: Restarting LampStack.
+    service: name={{ item }} state=restarted
+    with_items:
+    - mariadb
+    - httpd

@@ -1,0 +1,21 @@
+---
+
+#MySQL Settings
+mysql_root_password: "idjbd"
+mysql_db: "wordpress"
+mysql_user: "ec2-user"
+mysql_password: "kjfhv"
+login_user: "login"
+login_password: "password"
+
+#HTTP Settings
+http_host: "your_domain"
+http_conf: "your_domain.conf"
+http_port: "80"
+
+#wordpress config
+wordpress_db: "wordpress"
+wordpress_user: "admin"
+wordpress_password: "password123"
+
+ansible_python_interpreter: '/usr/bin/python3'
