@@ -33,7 +33,7 @@ resource "aws_alb" "alb" {
 
 resource "aws_alb_target_group" "targ" {
   name   = "WP-TargetGroup"
-  port = 8080
+  port = 80
   protocol = "HTTP"
   vpc_id = data.aws_vpc.vpc.id
 
@@ -41,7 +41,7 @@ resource "aws_alb_target_group" "targ" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    path                = "/"
+    path                = "/SamplePage.php"
     interval            = 30
     port                = 80
     matcher             = "200-399"
@@ -67,10 +67,17 @@ resource "aws_alb_target_group_attachment" "attach_web2" {
 }
 
 resource "aws_alb_listener" "list" {
+  load_balancer_arn = aws_alb.alb.arn
+  port = 80
+  protocol          = "HTTP"
+
   default_action {
     target_group_arn = aws_alb_target_group.targ.arn
     type = "forward"
   }
-  load_balancer_arn = aws_alb.alb.arn
-  port = 80
+  
+}
+
+output "lb_address" {
+  value = aws_alb.alb.dns_name
 }

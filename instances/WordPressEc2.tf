@@ -19,10 +19,11 @@ resource "aws_instance" "wp-serverA" {
   instance_type= "t2.micro"
   subnet_id = data.aws_subnet.PrivateSubnetA.id
   key_name = "ec2instance-key"
-  user_data = file("files/userdata.sh")
+  user_data = file("files/userdata.tfpl")
   tags = {
     Name = "webserver A"
          }
+  depends_on = [data.aws_db_instance.rds]
 }
 
 
@@ -33,10 +34,11 @@ resource "aws_instance" "wp-serverB" {
   instance_type= "t2.micro"
   subnet_id = data.aws_subnet.PrivateSubnetB.id
   key_name = "ec2instance-key"
-  user_data = file("files/userdata.sh")
+  user_data = file("files/userdata.tfpl")
   tags = {
     Name = "webserver B"
           }
+depends_on = [data.aws_db_instance.rds]
 }
 
 
@@ -54,3 +56,14 @@ data "aws_subnet" "PrivateSubnetB" {
     values = ["Private_SubnetB"]
     }
 }
+
+data "aws_db_instance" "rds" {
+  db_instance_identifier = "wp-db"
+}
+
+
+
+
+
+
+

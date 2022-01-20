@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Install necessary dependencies
+sudo yum -y install git
+sudo yum update -y
+sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+sudo yum install -y httpd mariadb-server
+sudo systemctl start httpd
+sudo systemctl enable httpd
+sudo usermod -a -G apache ec2-user
+sudo chown -R ec2-user:apache /var/www
+sudo chmod 2775 /var/www
+cd /var/www
+mkdir inc
+cd inc
+echo "<?php
+define('DB_SERVER', '${wp-db.csx4c8lydoo4.eu-west-1.rds.amazonaws.com}');
+define('DB_USERNAME', '${admin}');
+define('DB_PASSWORD', '${password123}');
+define('DB_DATABASE', '${wordpress_db}');
+?>" > dbinfo.inc
+
+
+sudo git clone https://github.com/arin7637/terraform-code-rds.git && cd terraform-code-rds
+sudo cp SamplePage.php index.html  /var/www/html/
